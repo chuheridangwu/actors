@@ -1,0 +1,31 @@
+@import "./base.css";
+
+#app {
+  /* 移除最大宽度限制，让各个页面自己控制容器宽度 */
+  margin: 0 auto;
+  padding: 0;
+  font-weight: normal;
+  min-height: 100vh;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  #app {
+    /* 移除强制的网格布局，让Element Plus的响应式系统正常工作 */
+    display: block;
+    padding: 0;
+  }
+}
