@@ -235,7 +235,15 @@ onMounted(() => {
                 >
                   {{ work.title }}
                 </el-tag>
-                <span class="work-size">{{ formatFileSize(work.size) }}</span>
+                <div class="work-meta">
+                  <span class="work-size">{{ formatFileSize(work.size) }}</span>
+                  <span
+                    v-if="work.duration && work.duration !== '0:00'"
+                    class="work-duration"
+                  >
+                    ⏱️ {{ work.duration }}
+                  </span>
+                </div>
               </div>
             </div>
             <div v-else class="no-works">
@@ -370,12 +378,30 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
+.work-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .work-size {
   font-size: 0.75rem;
   color: #909399;
   background: #f5f7fa;
   padding: 2px 6px;
   border-radius: 4px;
+}
+
+.work-duration {
+  font-size: 0.75rem;
+  color: #2d5a2d;
+  background: #e8f5e8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .no-works {

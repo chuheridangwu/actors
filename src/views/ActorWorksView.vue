@@ -161,6 +161,7 @@ const toggleWorkSelection = (work: Work) => {
       title: work.fields.Title,
       size: workSize,
       thumbnail,
+      duration: work.fields.Duration,
     });
   }
 };
@@ -201,12 +202,17 @@ const submitSelection = async () => {
     );
 
     // 将新选择的作品转换为详细信息格式
-    const newWorkDetails: any[] = selectedWorks.value.map((w) => ({
-      id: w.id,
-      title: w.title,
-      size: w.size,
-      thumbnail: w.thumbnail || "",
-    }));
+    const newWorkDetails: any[] = selectedWorks.value.map((w) => {
+      // 找到对应的Work对象以获取时长信息
+      const workData = works.value.find((work) => work.id === w.id);
+      return {
+        id: w.id,
+        title: w.title,
+        size: w.size,
+        thumbnail: w.thumbnail || "",
+        duration: workData?.fields.Duration || undefined,
+      };
+    });
 
     if (existingRecord) {
       // 如果已有记录，合并作品
@@ -385,6 +391,14 @@ onMounted(() => {
                 <div class="work-meta">
                   <span class="file-size">
                     {{ formatFileSize(work.fields.Size || "0") }}
+                  </span>
+                  <span
+                    v-if="
+                      work.fields.Duration && work.fields.Duration !== '0:00'
+                    "
+                    class="duration"
+                  >
+                    ⏱️ {{ work.fields.Duration }}
                   </span>
                 </div>
               </div>
@@ -669,6 +683,18 @@ onMounted(() => {
   padding: 2px 8px;
   border-radius: 6px;
   font-weight: 500;
+}
+
+.duration {
+  background: #e8f5e8;
+  color: #2d5a2d;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .work-description {

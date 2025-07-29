@@ -27,7 +27,8 @@ export interface Work {
         full?: { url: string; width: number; height: number };
       };
     }>;
-    Size?: string; // 文件大小，单位为字节
+    Size?: string; // 文件大小，如 "1.2 GB"
+    Duration?: string; // 视频时长，如 "1:45:30" 或 "2:15"
   };
 }
 
@@ -37,6 +38,7 @@ export interface SelectedWorkDetail {
   title: string;
   size: number;
   thumbnail?: string;
+  duration?: string; // 视频时长，如 "1:45:30" 或 "2:15"
 }
 
 // 选择记录数据类型
@@ -65,6 +67,7 @@ export interface SelectedWork {
   title: string;
   size: number;
   thumbnail?: string;
+  duration?: string; // 视频时长，如 "1:45:30" 或 "2:15"
 }
 
 // 路径导航项
