@@ -220,7 +220,7 @@ onMounted(() => {
 
 /* 确保所有卡片有一致的最小高度 */
 .actor-col .actor-card {
-  min-height: 140px;
+  min-height: 200px;
 }
 
 .actor-card {
@@ -247,10 +247,13 @@ onMounted(() => {
 
 .actor-content {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 16px;
   flex: 1;
   min-height: 0;
+  padding: 8px;
 }
 
 .actor-avatar {
@@ -258,35 +261,50 @@ onMounted(() => {
 }
 
 .avatar-image {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.avatar-image:hover {
+  transform: scale(1.05);
 }
 
 .avatar-placeholder {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: linear-gradient(135deg, #409eff, #66b1ff);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 24px;
+  font-size: 32px;
   font-weight: bold;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.avatar-placeholder:hover {
+  transform: scale(1.05);
 }
 
 .actor-info {
   flex: 1;
   min-width: 0;
+  width: 100%;
 }
 
 .actor-name {
-  margin: 0 0 8px 0;
-  font-size: 1.2rem;
+  margin: 0 0 12px 0;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #2c3e50;
+  line-height: 1.2;
+  word-break: break-word;
 }
 
 .actor-tags {
@@ -294,6 +312,7 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  justify-content: center;
 }
 
 .tag {
@@ -336,22 +355,46 @@ onMounted(() => {
   }
 
   .actor-col .actor-card {
-    min-height: 160px;
+    min-height: 240px;
+  }
+
+  .actor-card :deep(.el-card__body) {
+    padding: 24px;
+  }
+
+  .actor-content {
+    gap: 20px;
+    padding: 12px;
+  }
+
+  .avatar-image,
+  .avatar-placeholder {
+    width: 100px;
+    height: 100px;
+    font-size: 40px;
+  }
+
+  .actor-name {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+}
+
+/* 平板适配 */
+@media (max-width: 1199px) and (min-width: 992px) {
+  .actor-col .actor-card {
+    min-height: 220px;
   }
 
   .actor-card :deep(.el-card__body) {
     padding: 20px;
   }
 
-  .actor-content {
-    gap: 20px;
-  }
-
   .avatar-image,
   .avatar-placeholder {
-    width: 70px;
-    height: 70px;
-    font-size: 28px;
+    width: 90px;
+    height: 90px;
+    font-size: 36px;
   }
 
   .actor-name {
@@ -359,25 +402,25 @@ onMounted(() => {
   }
 }
 
-/* 平板适配 */
-@media (max-width: 1199px) and (min-width: 992px) {
+/* 小平板适配 */
+@media (max-width: 991px) and (min-width: 768px) {
   .actor-col .actor-card {
-    min-height: 150px;
+    min-height: 200px;
   }
 
   .actor-card :deep(.el-card__body) {
     padding: 18px;
   }
-}
 
-/* 小平板适配 */
-@media (max-width: 991px) and (min-width: 768px) {
-  .actor-col .actor-card {
-    min-height: 140px;
+  .avatar-image,
+  .avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
   }
 
-  .actor-card :deep(.el-card__body) {
-    padding: 16px;
+  .actor-name {
+    font-size: 1.3rem;
   }
 }
 
@@ -397,25 +440,28 @@ onMounted(() => {
   }
 
   .actor-col .actor-card {
-    min-height: 120px;
+    min-height: 180px;
   }
 
   .actor-card :deep(.el-card__body) {
-    padding: 14px;
+    padding: 16px;
   }
 
   .actor-content {
-    flex-direction: column;
-    text-align: center;
     gap: 12px;
+    padding: 4px;
   }
 
-  .actor-avatar {
-    align-self: center;
+  .avatar-image,
+  .avatar-placeholder {
+    width: 70px;
+    height: 70px;
+    font-size: 28px;
   }
 
-  .actor-tags {
-    justify-content: center;
+  .actor-name {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
   }
 }
 
@@ -433,23 +479,33 @@ onMounted(() => {
     margin-bottom: 20px;
   }
 
+  .actor-col .actor-card {
+    min-height: 160px;
+  }
+
   .actor-card {
     border-radius: 8px;
   }
 
+  .actor-card :deep(.el-card__body) {
+    padding: 12px;
+  }
+
   .actor-content {
     gap: 8px;
+    padding: 2px;
   }
 
   .avatar-image,
   .avatar-placeholder {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
   }
 
   .actor-name {
     font-size: 1.1rem;
+    margin-bottom: 8px;
   }
 
   .tag {
