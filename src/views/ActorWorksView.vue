@@ -360,28 +360,45 @@ onMounted(() => {
             @click="handleCardClick(work, $event)"
           >
             <div class="work-content">
-              <!-- 选择框 -->
-              <div
-                class="selection-area"
-                @click.stop="toggleWorkSelection(work)"
-              >
-                <el-checkbox
-                  :model-value="isWorkSelected(work.id)"
-                  @change="handleCheckboxChange(work)"
-                  size="large"
-                />
-              </div>
+              <!-- 作品缩略图容器 -->
+              <div class="work-thumbnail-container">
+                <!-- 缩略图 -->
+                <div class="work-thumbnail">
+                  <img
+                    v-if="work.fields.Gallery?.[0]?.thumbnails?.full?.url"
+                    :src="work.fields.Gallery[0].thumbnails.full.url"
+                    :alt="work.fields.Title"
+                    class="thumbnail-image"
+                  />
+                  <div v-else class="thumbnail-placeholder">
+                    <span>{{ work.fields.Title.charAt(0) }}</span>
+                  </div>
+                </div>
 
-              <!-- 作品缩略图 -->
-              <div class="work-thumbnail">
-                <img
-                  v-if="work.fields.Gallery?.[0]?.thumbnails?.small?.url"
-                  :src="work.fields.Gallery[0].thumbnails.small.url"
-                  :alt="work.fields.Title"
-                  class="thumbnail-image"
-                />
-                <div v-else class="thumbnail-placeholder">
-                  <span>{{ work.fields.Title.charAt(0) }}</span>
+                <!-- 选择框覆盖层 -->
+                <div
+                  class="selection-overlay"
+                  @click.stop="toggleWorkSelection(work)"
+                >
+                  <el-checkbox
+                    :model-value="isWorkSelected(work.id)"
+                    @change="handleCheckboxChange(work)"
+                    size="large"
+                    class="selection-checkbox"
+                  />
+                </div>
+
+                <!-- 已选择状态指示器 -->
+                <div v-if="isWorkSelected(work.id)" class="selected-indicator">
+                  <span class="selected-icon">✓</span>
+                </div>
+
+                <!-- 已在历史记录中选择的状态指示器 -->
+                <div
+                  v-if="isWorkAlreadySelected(work.id)"
+                  class="already-selected-indicator"
+                >
+                  <span class="already-selected-text">已选</span>
                 </div>
               </div>
 
@@ -488,7 +505,7 @@ onMounted(() => {
 
 /* 确保所有卡片有一致的最小高度 */
 .work-col .work-card {
-  min-height: 180px;
+  min-height: 280px;
 }
 
 .work-card {
@@ -516,50 +533,14 @@ onMounted(() => {
 
 .work-card.selected {
   border-color: #409eff;
-  box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.3);
-  background: linear-gradient(
-    135deg,
-    rgba(64, 158, 255, 0.05),
-    rgba(64, 158, 255, 0.1)
-  );
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
   transform: translateY(-2px);
 }
 
-.work-card.selected::before {
-  content: "";
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  background: #409eff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.work-card.selected::after {
-  content: "✓";
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-}
-
-/* 已在历史记录中选择的作品样式 */
 .work-card.already-selected {
   border-color: #e6a23c;
   background-color: #fdf6ec;
-  opacity: 0.7;
+  opacity: 0.8;
   cursor: not-allowed;
 }
 
@@ -568,127 +549,165 @@ onMounted(() => {
   box-shadow: 0 2px 8px rgba(230, 162, 60, 0.3);
 }
 
-.work-card.already-selected::before {
-  content: "";
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  background: rgba(230, 162, 60, 0.2);
-  border-radius: 50%;
-  z-index: 1;
-}
-
-.work-card.already-selected::after {
-  content: "已选";
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  background: #e6a23c;
-  color: white;
-  border-radius: 50%;
-  font-size: 10px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
-
 .work-content {
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
 }
 
-.selection-area {
-  flex-shrink: 0;
-  padding: 8px;
-  margin: -4px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-}
-
-.selection-area:hover {
-  background-color: rgba(64, 158, 255, 0.1);
-}
-
-/* 确保选择框区域完全可点击 */
-.selection-area .el-checkbox {
-  pointer-events: none;
-}
-
-/* 让选择框区域接管所有点击事件 */
-.selection-area .el-checkbox__input {
-  pointer-events: none;
-}
-
-.selection-area .el-checkbox__inner {
-  pointer-events: none;
+/* 缩略图容器 */
+.work-thumbnail-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9; /* 16:9 宽高比 */
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f5f7fa;
 }
 
 .work-thumbnail {
-  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .thumbnail-image {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.thumbnail-image:hover {
+  transform: scale(1.05);
 }
 
 .thumbnail-placeholder {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(135deg, #667eea, #764ba2);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 24px;
+  font-size: 2rem;
   font-weight: bold;
+}
+
+/* 选择框覆盖层 */
+.selection-overlay {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.selection-overlay:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+}
+
+.selection-checkbox {
+  pointer-events: none;
+}
+
+/* 已选择状态指示器 */
+.selected-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  background: #409eff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.4);
+}
+
+.selected-icon {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* 已在历史记录中选择的状态指示器 */
+.already-selected-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  background: #e6a23c;
+  color: white;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bold;
+  z-index: 4;
+  box-shadow: 0 2px 8px rgba(230, 162, 60, 0.4);
+}
+
+.already-selected-text {
+  line-height: 1;
 }
 
 .work-info {
   flex: 1;
   min-width: 0;
+  padding: 0 4px;
 }
 
 .work-title {
   margin: 0 0 8px 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #2c3e50;
-  line-height: 1.3;
+  line-height: 1.4;
+
+  /* 最多显示3行，超出显示省略号 */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+
+  /* 设置最小高度确保布局一致性 */
+  min-height: calc(1.4em * 2); /* 至少2行的高度 */
+  max-height: calc(1.4em * 3); /* 最多3行的高度 */
 }
 
 .work-meta {
   display: flex;
-  gap: 12px;
-  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
   font-size: 0.85rem;
   color: #64748b;
 }
 
 .file-size {
   background: #f1f5f9;
-  padding: 2px 8px;
+  color: #475569;
+  padding: 4px 8px;
   border-radius: 6px;
   font-weight: 500;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 .duration {
   background: #e8f5e8;
   color: #2d5a2d;
-  padding: 2px 8px;
+  padding: 4px 8px;
   border-radius: 6px;
   font-weight: 500;
   font-size: 0.8rem;
@@ -742,32 +761,31 @@ onMounted(() => {
     gap: 16px;
   }
 
-  .works-grid {
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 30px;
+  .work-col .work-card {
+    min-height: 320px;
   }
 
-  .work-card {
-    padding: 24px;
-    border-radius: 16px;
+  .work-card :deep(.el-card__body) {
+    padding: 20px;
   }
 
-  .work-content {
-    gap: 20px;
-  }
-
-  .thumbnail-image,
-  .thumbnail-placeholder {
-    width: 100px;
-    height: 100px;
+  .work-thumbnail-container {
+    margin-bottom: 16px;
   }
 
   .work-title {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
   }
 
   .work-meta {
-    font-size: 1rem;
+    gap: 10px;
+  }
+
+  .file-size,
+  .duration {
+    font-size: 0.85rem;
+    padding: 5px 10px;
   }
 }
 
@@ -777,21 +795,23 @@ onMounted(() => {
     padding: 25px 30px;
   }
 
-  .works-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
+  .work-col .work-card {
+    min-height: 300px;
   }
 
-  .work-card {
-    padding: 20px;
+  .work-card :deep(.el-card__body) {
+    padding: 18px;
   }
 }
 
 /* 平板适配 */
 @media (max-width: 1024px) and (min-width: 769px) {
-  .works-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+  .work-col .work-card {
+    min-height: 280px;
+  }
+
+  .work-card :deep(.el-card__body) {
+    padding: 16px;
   }
 
   .stats-bar {
@@ -805,9 +825,21 @@ onMounted(() => {
     padding: 12px;
   }
 
-  .works-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+  .work-col .work-card {
+    min-height: 260px;
+  }
+
+  .work-card :deep(.el-card__body) {
+    padding: 14px;
+  }
+
+  .work-thumbnail-container {
+    margin-bottom: 10px;
+  }
+
+  .work-title {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
   }
 
   .stats-bar {
@@ -833,30 +865,6 @@ onMounted(() => {
     font-size: 1.5rem;
     margin-bottom: 12px;
   }
-
-  .work-content {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .work-thumbnail {
-    align-self: center;
-  }
-
-  .thumbnail-image,
-  .thumbnail-placeholder {
-    width: 100px;
-    height: 100px;
-  }
-
-  .work-card.selected::before,
-  .work-card.selected::after {
-    top: 4px;
-    right: 4px;
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-  }
 }
 
 /* 小屏手机适配 */
@@ -877,18 +885,56 @@ onMounted(() => {
     font-size: 1.3rem;
   }
 
+  .work-col .work-card {
+    min-height: 240px;
+  }
+
   .work-card {
     border-radius: 8px;
   }
 
-  .work-content {
-    gap: 8px;
+  .work-card :deep(.el-card__body) {
+    padding: 12px;
   }
 
-  .thumbnail-image,
-  .thumbnail-placeholder {
-    width: 80px;
-    height: 80px;
+  .work-thumbnail-container {
+    margin-bottom: 8px;
+  }
+
+  .work-title {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    min-height: calc(1.4em * 1.5);
+  }
+
+  .work-meta {
+    gap: 6px;
+  }
+
+  .file-size,
+  .duration {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+  }
+
+  .selected-indicator,
+  .already-selected-indicator {
+    top: 6px;
+    right: 6px;
+  }
+
+  .selected-indicator {
+    width: 24px;
+    height: 24px;
+  }
+
+  .selected-icon {
+    font-size: 14px;
+  }
+
+  .selection-overlay {
+    top: 6px;
+    left: 6px;
   }
 
   .work-title {
